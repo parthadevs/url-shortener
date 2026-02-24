@@ -109,6 +109,10 @@ export default function RootLayout({
       <body suppressHydrationWarning className="min-h-screen bg-background font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
+
+            <div className="absolute -top-[10%] -right-[10%] h-[500px] w-[500px] rounded-full bg-primary/5 blur-[120px] pointer-events-none"></div>
+            <div className="absolute -bottom-[10%] -left-[10%] h-[500px] w-[500px] rounded-full bg-primary/5 blur-[120px] pointer-events-none"></div>
+
             <Suspense>{children}</Suspense>
             <Toaster />
             <Analytics />

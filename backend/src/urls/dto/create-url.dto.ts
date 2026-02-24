@@ -8,4 +8,8 @@ export class CreateUrlDto {
     @IsOptional()
     @IsString()
     customSlug?: string;
+
+    @IsOptional()
+    @IsString()
+    expiresAt?: string;
 }

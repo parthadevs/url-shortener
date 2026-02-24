@@ -40,6 +40,7 @@ export class UrlsService {
                 shortUrl,
                 originalUrl: createUrlDto.originalUrl,
                 userId: userId,
+                expiresAt: createUrlDto.expiresAt ? new Date(createUrlDto.expiresAt) : null,
             },
         });
 

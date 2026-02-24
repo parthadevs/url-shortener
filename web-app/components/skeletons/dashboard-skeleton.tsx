@@ -1,104 +1,99 @@
-import { BarChart3, LinkIcon, TrendingUp, Users } from "lucide-react"
+import { BarChart3, LinkIcon, TrendingUp, Users, Zap } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export function DashboardSkeleton() {
   return (
-    <div className="space-y-6">
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-7 w-24" />
-            <Skeleton className="mt-1 h-4 w-32" />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active URLs</CardTitle>
-            <LinkIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-7 w-16" />
-            <Skeleton className="mt-1 h-4 w-32" />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-7 w-20" />
-            <Skeleton className="mt-1 h-4 w-32" />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Earnings/Click</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-7 w-16" />
-            <Skeleton className="mt-1 h-4 w-32" />
-          </CardContent>
-        </Card>
+    <div className="flex flex-col gap-8">
+      {/* Welcome Header Skeleton */}
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-9 w-64" />
+        <Skeleton className="h-5 w-96" />
       </div>
 
-      {/* Create URL and Recent Activity */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="lg:col-span-4">
+      {/* Stats Cards Skeleton */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[
+          { title: "Total Earnings", icon: TrendingUp },
+          { title: "Active URLs", icon: LinkIcon },
+          { title: "Total Clicks", icon: Users },
+          { title: "Avg. CPC", icon: BarChart3 },
+        ].map((stat, idx) => (
+          <Card key={idx} className="border-border/50 bg-background/50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-8 w-24" />
+                  <Skeleton className="h-3 w-32" />
+                </div>
+                <div className="rounded-2xl bg-muted p-2.5">
+                  <stat.icon className="w-5 h-5 text-muted-foreground/50" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Main Content Area Skeleton */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="lg:col-span-4 border-border/50 bg-background/50">
           <CardHeader>
-            <Skeleton className="h-6 w-40" />
-            <Skeleton className="h-4 w-64" />
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-muted">
+                <Zap className="w-5 h-5 text-muted-foreground/50" />
+              </div>
+              <Skeleton className="h-7 w-48" />
+            </div>
+            <Skeleton className="h-5 w-80" />
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-              <div className="space-y-2">
+            <div className="grid gap-6">
+              <div className="grid gap-3">
                 <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-12 w-full" />
               </div>
-              <Skeleton className="h-10 w-full" />
+              <div className="grid gap-3">
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-12 w-full" />
+              </div>
+              <Skeleton className="h-12 w-full" />
             </div>
           </CardContent>
         </Card>
-        <Card className="lg:col-span-3">
+
+        <Card className="lg:col-span-3 border-border/50 bg-background/50">
           <CardHeader>
-            <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-4 w-48" />
+            <div className="flex items-center justify-between">
+              <div>
+                <Skeleton className="h-6 w-40" />
+                <Skeleton className="h-4 w-32 mt-1" />
+              </div>
+              <TrendingUp className="w-5 h-5 text-muted-foreground/30" />
+            </div>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="today">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="today">Today</TabsTrigger>
-                <TabsTrigger value="week">This Week</TabsTrigger>
-                <TabsTrigger value="month">This Month</TabsTrigger>
-              </TabsList>
-              <TabsContent value="today" className="space-y-4 pt-4">
-                {Array(3)
-                  .fill(0)
-                  .map((_, index) => (
-                    <div key={index} className="flex items-center justify-between border-b pb-2">
-                      <div className="flex items-center gap-2">
-                        <LinkIcon className="h-4 w-4 text-primary" />
-                        <Skeleton className="h-4 w-24" />
-                      </div>
-                      <Skeleton className="h-4 w-12" />
+            <div className="space-y-4">
+              {Array(4).fill(0).map((_, i) => (
+                <div key={i} className="flex items-center justify-between p-3">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-10 w-10 rounded-xl" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-3 w-16" />
                     </div>
-                  ))}
-              </TabsContent>
-            </Tabs>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-3 w-10" />
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>

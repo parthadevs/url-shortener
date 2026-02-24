@@ -1,22 +1,47 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { AlertCircle, ArrowDown, ArrowUp, Calendar, CreditCard, DollarSign } from "lucide-react"
+import { AlertCircle, ArrowDown, ArrowUp, Calendar, CreditCard, DollarSign, RotateCcw } from "lucide-react"
 import { useAuth } from "@/components/auth-context"
 import { useRouter } from "next/navigation"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
+import { motion } from "framer-motion"
 
 export default function WithdrawalsContent() {
   const { token } = useAuth()
   const { toast } = useToast()
   const router = useRouter()
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 12,
+      },
+    },
+  }
   const [isLoading, setIsLoading] = useState(false)
   const [withdrawals, setWithdrawals] = useState<{ id: string; amount: number; status: string; paymentMethod: string; createdAt: string }[]>([])
   const [balance, setBalance] = useState(0)
@@ -181,139 +206,188 @@ export default function WithdrawalsContent() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-bold tracking-tight">Withdrawals</h2>
+    <div className="relative space-y-8 min-h-screen">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-0 right-0 -z-10 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 -z-10 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Balance</CardTitle>
-            <CardDescription>Your current available balance</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-2">
-              <DollarSign className="h-5 w-5 text-muted-foreground" />
-              <span className="text-2xl font-bold">{balance ? Number(balance).toFixed(2) : "0.00"}</span>
-            </div>
-          </CardContent>
-        </Card>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-8 relative z-10"
+      >
+        <motion.div variants={itemVariants}>
+          <h2 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Withdrawals</h2>
+          <p className="text-muted-foreground text-lg">Manage and track your earnings withdrawals.</p>
+        </motion.div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Request Withdrawal</CardTitle>
-            <CardDescription>Withdraw your earnings</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {!profileComplete && (
-              <Alert variant="destructive" className="mb-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Incomplete Profile</AlertTitle>
-                <AlertDescription>
-                  Please complete your profile before requesting a withdrawal.
-                  <ul className="mt-2 list-disc pl-5 text-sm">
-                    {missingFields.name && <li>Full Name</li>}
-                    {missingFields.address && <li>Address</li>}
-                    {missingFields.city && <li>City</li>}
-                    {missingFields.country && <li>Country</li>}
-                    {missingFields.zipCode && <li>ZIP/Postal Code</li>}
-                    {missingFields.paymentEmail && <li>Payment Email</li>}
-                  </ul>
-                </AlertDescription>
-              </Alert>
-            )}
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="amount">Amount</Label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="amount"
-                    type="number"
-                    placeholder="0.00"
-                    className="pl-10"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    min="0"
-                    step="0.01"
-                  />
+        <div className="grid gap-8 md:grid-cols-2">
+          <motion.div variants={itemVariants}>
+            <Card className="border-border/50 bg-background/50 backdrop-blur-xl shadow-xl overflow-hidden h-full">
+              <CardHeader className="bg-primary/5 border-b border-border/50 pb-6">
+                <CardTitle className="text-xl font-bold flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-primary" />
+                  Available Balance
+                </CardTitle>
+                <CardDescription>Your current earnings ready for withdrawal</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-8 pb-10 flex flex-col items-center justify-center">
+                <div className="text-5xl font-black text-primary tracking-tighter mb-2">
+                  ${balance ? Number(balance).toFixed(2) : "0.00"}
                 </div>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col items-start space-y-2">
-            <div className="text-sm text-muted-foreground">Minimum withdrawal amount: $10.00</div>
-            {!profileComplete ? (
-              <Button variant="outline" className="w-full" onClick={() => router.push("/dashboard/profile")}>
-                Complete Profile
-              </Button>
-            ) : (
-              <Button
-                className="w-full"
-                onClick={handleWithdraw}
-                disabled={
-                  isLoading || !amount || Number.parseFloat(amount) <= 0 || Number.parseFloat(amount) > balance
-                }
-              >
-                {isLoading ? "Processing..." : "Request Withdrawal"}
-              </Button>
-            )}
-          </CardFooter>
-        </Card>
-      </div>
+                <div className="text-sm text-muted-foreground font-medium uppercase tracking-widest">USD Balance</div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-      <Card className="mt-4">
-        <CardHeader>
-          <CardTitle>Withdrawal History</CardTitle>
-          <CardDescription>View your withdrawal requests</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {withdrawals.length > 0 ? (
-            <div className="space-y-4">
-              {withdrawals.map((withdrawal) => (
-                <div key={withdrawal.id} className="flex flex-col space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      {withdrawal.status === "approved" ? (
-                        <ArrowUp className="h-4 w-4 text-green-500" />
-                      ) : withdrawal.status === "rejected" ? (
-                        <AlertCircle className="h-4 w-4 text-red-500" />
-                      ) : (
-                        <ArrowDown className="h-4 w-4 text-yellow-500" />
-                      )}
-                      <span className="font-medium">${withdrawal.amount ? Number(withdrawal.amount).toFixed(2) : "0.00"}</span>
-
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className={`text-sm font-medium capitalize ${getStatusColor(withdrawal.status)}`}>
-                        {withdrawal.status}
-                      </span>
+          <motion.div variants={itemVariants}>
+            <Card className="border-border/50 bg-background/50 backdrop-blur-xl shadow-xl overflow-hidden h-full">
+              <CardHeader className="bg-primary/5 border-b border-border/50 pb-6">
+                <CardTitle className="text-xl font-bold">Request Withdrawal</CardTitle>
+                <CardDescription>Withdraw your earnings to your preferred method</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                {!profileComplete && (
+                  <Alert variant="destructive" className="mb-6 bg-destructive/5 border-destructive/20 backdrop-blur-xl">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle className="font-bold">Incomplete Profile</AlertTitle>
+                    <AlertDescription className="mt-2 text-sm italic">
+                      Please complete your profile before requesting a withdrawal.
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {missingFields.name && <Badge variant="outline" className="bg-destructive/10">Full Name</Badge>}
+                        {missingFields.address && <Badge variant="outline" className="bg-destructive/10">Address</Badge>}
+                        {missingFields.city && <Badge variant="outline" className="bg-destructive/10">City</Badge>}
+                        {missingFields.country && <Badge variant="outline" className="bg-destructive/10">Country</Badge>}
+                        {missingFields.zipCode && <Badge variant="outline" className="bg-destructive/10">ZIP Code</Badge>}
+                        {missingFields.paymentEmail && <Badge variant="outline" className="bg-destructive/10">Payment Email</Badge>}
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label htmlFor="amount" className="text-sm font-semibold ml-1">Amount to Withdraw</Label>
+                    <div className="relative">
+                      <DollarSign className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="amount"
+                        type="number"
+                        placeholder="0.00"
+                        className="pl-10 h-11 bg-background/50 border-border/50 focus:border-primary/50 transition-all"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        min="0"
+                        step="0.01"
+                      />
                     </div>
                   </div>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <div className="flex items-center space-x-2">
-                      <CreditCard className="h-4 w-4" />
-                      <span>{withdrawal.paymentMethod}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4" />
-                      <span>{formatDate(withdrawal.createdAt)}</span>
-                    </div>
-                  </div>
-                  <Separator className="my-2" />
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <CreditCard className="mb-2 h-8 w-8 text-muted-foreground" />
-              <h3 className="text-lg font-medium">No withdrawals yet</h3>
-              <p className="text-sm text-muted-foreground">
-                Your withdrawal history will appear here once you make a request.
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              </CardContent>
+              <CardFooter className="flex flex-col items-start gap-4 bg-primary/5 border-t border-border/50 p-6">
+                <div className="text-xs text-muted-foreground italic font-medium">Minimum withdrawal: <span className="text-primary">$10.00</span></div>
+                {!profileComplete ? (
+                  <Button variant="outline" className="w-full h-11 border-primary/20 text-primary hover:bg-primary/10 transition-all duration-300 font-bold" onClick={() => router.push("/dashboard/profile")}>
+                    Complete Profile
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full h-11 bg-primary/80 hover:bg-primary transition-all duration-300 font-bold"
+                    onClick={handleWithdraw}
+                    disabled={
+                      isLoading || !amount || Number.parseFloat(amount) <= 0 || Number.parseFloat(amount) > balance
+                    }
+                  >
+                    {isLoading ? (
+                      <>
+                        <RotateCcw className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <ArrowUp className="mr-2 h-4 w-4" />
+                        Request Withdrawal
+                      </>
+                    )}
+                  </Button>
+                )}
+              </CardFooter>
+            </Card>
+          </motion.div>
+        </div>
+
+        <motion.div variants={itemVariants}>
+          <Card className="border-border/50 bg-background/50 backdrop-blur-xl shadow-xl overflow-hidden">
+            <CardHeader className="bg-primary/5 border-b border-border/50">
+              <CardTitle className="text-xl font-bold flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                Withdrawal History
+              </CardTitle>
+              <CardDescription>View and track your previous withdrawal requests</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {withdrawals.length > 0 ? (
+                <div className="space-y-4">
+                  {withdrawals.map((withdrawal) => (
+                    <motion.div
+                      key={withdrawal.id}
+                      className="group p-4 rounded-xl border border-border/50 bg-background/30 hover:bg-primary/5 transition-all duration-300"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div className={`p-2 rounded-full ${withdrawal.status === "approved" ? "bg-green-500/10" :
+                            withdrawal.status === "rejected" ? "bg-red-500/10" : "bg-yellow-500/10"
+                            }`}>
+                            {withdrawal.status === "approved" ? (
+                              <ArrowUp className="h-4 w-4 text-green-500" />
+                            ) : withdrawal.status === "rejected" ? (
+                              <AlertCircle className="h-4 w-4 text-red-500" />
+                            ) : (
+                              <ArrowDown className="h-4 w-4 text-yellow-500" />
+                            )}
+                          </div>
+                          <div>
+                            <div className="font-bold text-lg">${Number(withdrawal.amount).toFixed(2)}</div>
+                            <div className="text-xs text-muted-foreground">{formatDate(withdrawal.createdAt)}</div>
+                          </div>
+                        </div>
+                        <Badge className={`px-3 py-1 font-bold ${withdrawal.status === "approved" ? "bg-green-500/20 text-green-500 border-green-500/50" :
+                          withdrawal.status === "rejected" ? "bg-red-500/20 text-red-500 border-red-500/50" :
+                            "bg-yellow-500/20 text-yellow-500 border-yellow-500/50"
+                          }`}>
+                          {withdrawal.status.toUpperCase()}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground pt-4 border-t border-border/30">
+                        <div className="flex items-center space-x-2 bg-background/50 px-3 py-1 rounded-full border border-border/30">
+                          <CreditCard className="h-3.5 w-3.5" />
+                          <span className="font-medium">{withdrawal.paymentMethod}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 bg-background/50 px-3 py-1 rounded-full border border-border/30">
+                          <Calendar className="h-3.5 w-3.5" />
+                          <span className="font-medium text-[11px] truncate">{withdrawal.id}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center bg-primary/5 rounded-2xl border border-dashed border-primary/20">
+                  <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                    <CreditCard className="h-8 w-8 text-primary/50" />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground">No withdrawals yet</h3>
+                  <p className="text-sm text-muted-foreground mt-1 max-w-[200px]">
+                    Your withdrawal history will appear here once you make a request.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
     </div>
   )
 }

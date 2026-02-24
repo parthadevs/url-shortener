@@ -60,7 +60,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
           </SidebarHeader>
 
           <SidebarContent className="px-4 py-4">
-            <SidebarMenu>
+            <SidebarMenu className="space-y-2">
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === "/dashboard"}>
                   <Link href="/dashboard">

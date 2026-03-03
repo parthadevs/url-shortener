@@ -5,7 +5,7 @@ import { UpdatePaymentDto } from './dto/update-payment.dto';
 
 @Injectable()
 export class PaymentsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async createWithdrawal(userId: string, createPaymentDto: CreatePaymentDto) {
     // Get user to check balance and required fields
@@ -26,7 +26,14 @@ export class PaymentsService {
     if (!user) throw new BadRequestException('User not found');
 
     // Check if user has completed their profile
-    if (!user.name || !user.address || !user.city || !user.country || !user.zipCode || !user.paymentEmail) {
+    if (
+      !user.name ||
+      !user.address ||
+      !user.city ||
+      !user.country ||
+      !user.zipCode ||
+      !user.paymentEmail
+    ) {
       throw new BadRequestException({
         message: 'Incomplete profile',
         missingFields: {
@@ -67,18 +74,19 @@ export class PaymentsService {
 
     return {
       ...withdrawal,
-      amount: Number(withdrawal.amount)
+      amount: Number(withdrawal.amount),
     };
   }
 
   async findAll(userId: string) {
-    const withdrawals = await this.prisma.withdrawal.findMany({ where: { userId } });
-    return withdrawals.map(w => ({
+    const withdrawals = await this.prisma.withdrawal.findMany({
+      where: { userId },
+    });
+    return withdrawals.map((w) => ({
       ...w,
-      amount: Number(w.amount)
+      amount: Number(w.amount),
     }));
   }
-
 
   findOne(id: string) {
     return this.prisma.withdrawal.findUnique({ where: { id } });

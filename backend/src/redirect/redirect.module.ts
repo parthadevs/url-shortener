@@ -2,6 +2,6 @@ import { Module } from '@nestjs/common';
 import { RedirectController } from './redirect.controller';
 
 @Module({
-  controllers: [RedirectController]
+  controllers: [RedirectController],
 })
 export class RedirectModule {}

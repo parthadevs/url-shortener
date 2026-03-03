@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   findAll() {
     return this.prisma.user.findMany();
@@ -16,7 +16,7 @@ export class UsersService {
       const { password, ...result } = user;
       return {
         ...result,
-        balance: Number(result.balance)
+        balance: Number(result.balance),
       };
     }
     return null;
@@ -47,13 +47,21 @@ export class UsersService {
 
     return {
       ...user,
-      balance: Number(user.balance)
+      balance: Number(user.balance),
     };
   }
 
-
   async updateProfile(userId: string, data: any) {
-    const { name, username, paymentEmail, paymentMethod, address, city, country, zipCode } = data;
+    const {
+      name,
+      username,
+      paymentEmail,
+      paymentMethod,
+      address,
+      city,
+      country,
+      zipCode,
+    } = data;
 
     if (username) {
       const existingUser = await this.prisma.user.findUnique({
@@ -111,7 +119,7 @@ export class UsersService {
     let settings = {};
     try {
       settings = user?.settings ? JSON.parse(user.settings) : {};
-    } catch (e) { }
+    } catch (e) {}
 
     const apiKey = `sk_${require('crypto').randomBytes(24).toString('hex')}`;
     const now = new Date().toISOString();
@@ -143,7 +151,7 @@ export class UsersService {
     let settings = {};
     try {
       settings = user?.settings ? JSON.parse(user.settings) : {};
-    } catch (e) { }
+    } catch (e) {}
 
     const updatedSettings = {
       ...settings,
@@ -173,7 +181,10 @@ export class UsersService {
       throw new Error('User not found or password not set');
     }
 
-    const isMatch = await require('bcryptjs').compare(currentPassword, user.password);
+    const isMatch = await require('bcryptjs').compare(
+      currentPassword,
+      user.password,
+    );
     if (!isMatch) {
       throw new Error('Current password is incorrect');
     }

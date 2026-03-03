@@ -5,6 +5,7 @@ import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { useAuth } from "@/components/auth-context"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import SupportChat from "@/components/dashboard/support-chat"
 
 export default function DashboardLayout({
   children,
@@ -24,5 +25,10 @@ export default function DashboardLayout({
     return <div className="flex h-screen items-center justify-center">Loading...</div>
   }
 
-  return <DashboardSidebar>{children}</DashboardSidebar>
+  return (
+    <DashboardSidebar>
+      {children}
+      <SupportChat />
+    </DashboardSidebar>
+  )
 }

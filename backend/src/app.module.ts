@@ -8,6 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { PaymentsModule } from './payments/payments.module';
 import { RedirectModule } from './redirect/redirect.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { SupportModule } from './support/support.module';
 
 @Module({
   imports: [
@@ -18,8 +19,9 @@ import { AnalyticsModule } from './analytics/analytics.module';
     PaymentsModule,
     RedirectModule,
     AnalyticsModule,
+    SupportModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
